@@ -32,6 +32,7 @@ echo "[+] Cloning destination git repository $DESTINATION_REPOSITORY_NAME"
 # Setup git
 git config --global user.email "$USER_EMAIL"
 git config --global user.name "$USER_NAME"
+git config --global user.password "$API_TOKEN_GITHUB"
 
 {
 	git clone --single-branch --branch "$TARGET_BRANCH" "https://$USER_NAME:$API_TOKEN_GITHUB@$GITHUB_SERVER/$DESTINATION_REPOSITORY_USERNAME/$DESTINATION_REPOSITORY_NAME.git" "$CLONE_DIR"
@@ -63,11 +64,6 @@ mkdir -p "$ABSOLUTE_TARGET_DIRECTORY"
 echo "[+] Listing Current Directory Location"
 ls -al
 
-echo "[+] Listing root Location"
-ls -al /
-
-mv "$TEMP_DIR/.git" "$CLONE_DIR/.git"
-
 echo "[+] List contents of $SOURCE_DIRECTORY"
 ls "$SOURCE_DIRECTORY"
 
@@ -87,15 +83,19 @@ then
 fi
 
 echo "[+] Copying contents of source repository folder $SOURCE_DIRECTORY to folder $TARGET_DIRECTORY in git repo $DESTINATION_REPOSITORY_NAME"
-cp -ra "$SOURCE_DIRECTORY"/. "$CLONE_DIR/$TARGET_DIRECTORY"
+cp -ra "$SOURCE_DIRECTORY"/. "$ABSOLUTE_TARGET_DIRECTORY"
 cd "$CLONE_DIR"
+
+echo "[+] Deleting current /.git"
+rm -rf "$ABSOLUTE_TARGET_DIRECTORY/.git"
+
+echo "[+] Move back .git"
+mv "$TEMP_DIR/.git" "$CLONE_DIR/.git"
 
 echo "[+] Files that will be pushed"
 ls -la
 
-ORIGIN_COMMIT="https://$GITHUB_SERVER/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
-COMMIT_MESSAGE="${COMMIT_MESSAGE/ORIGIN_COMMIT/$ORIGIN_COMMIT}"
-COMMIT_MESSAGE="${COMMIT_MESSAGE/\$GITHUB_REF/$GITHUB_REF}"
+COMMIT_MESSAGE="update"
 
 echo "[+] Adding git commit"
 git add .
@@ -103,10 +103,12 @@ git add .
 echo "[+] git status:"
 git status
 
+echo "[+] git status:"
+
 echo "[+] git diff-index:"
 # git diff-index : to avoid doing the git commit failing if there are no changes to be commit
 git diff-index --quiet HEAD || git commit --message "$COMMIT_MESSAGE"
 
 echo "[+] Pushing git commit"
 # --set-upstream: sets de branch when pushing to a branch that does not exist
-git push --set-upstream "$TARGET_BRANCH"
+git push "https://$USER_NAME:$API_TOKEN_GITHUB@$GITHUB_SERVER/$DESTINATION_REPOSITORY_USERNAME/$DESTINATION_REPOSITORY_NAME.git" --set-upstream "$TARGET_BRANCH"
