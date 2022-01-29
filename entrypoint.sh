@@ -86,8 +86,10 @@ echo "[+] Copying contents of source repository folder $SOURCE_DIRECTORY to fold
 cp -ra "$SOURCE_DIRECTORY"/. "$ABSOLUTE_TARGET_DIRECTORY"
 cd "$CLONE_DIR"
 
-echo "[+] Deleting current /.git"
+echo "[+] Deleting current /.git /.github /.vscode"
 rm -rf "$ABSOLUTE_TARGET_DIRECTORY/.git"
+rm -rf "$ABSOLUTE_TARGET_DIRECTORY/.github"
+rm -rf "$ABSOLUTE_TARGET_DIRECTORY/.vscode"
 
 echo "[+] Move back .git"
 mv "$TEMP_DIR/.git" "$CLONE_DIR/.git"
