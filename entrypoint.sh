@@ -33,6 +33,7 @@ echo "[+] Cloning destination git repository $DESTINATION_REPOSITORY_NAME"
 git config --global user.email "$USER_EMAIL"
 git config --global user.name "$USER_NAME"
 git config --global user.password "$API_TOKEN_GITHUB"
+git config --global --add safe.directory $CLONE_DIR
 
 {
 	git clone --single-branch --branch "$TARGET_BRANCH" "https://$USER_NAME:$API_TOKEN_GITHUB@$GITHUB_SERVER/$DESTINATION_REPOSITORY_USERNAME/$DESTINATION_REPOSITORY_NAME.git" "$CLONE_DIR"
